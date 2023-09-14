@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (isset($_SESSION["user"])) {
-   header("Location: studentregister.php");
+   header("Location: index.php");
 }
 ?>
 <!DOCTYPE html>
@@ -18,8 +18,8 @@ if (isset($_SESSION["user"])) {
     <div class="container">
         <?php
         if (isset($_POST["submit"])) {
-           $fullName = $_POST["fullname"];
-           $studentid = $_POST["studentid"];
+        
+           $id = $_POST["id"];
            $password = $_POST["password"];
            $passwordRepeat = $_POST["repeat_password"];
            
@@ -27,7 +27,7 @@ if (isset($_SESSION["user"])) {
 
            $errors = array();
            
-           if (empty($fullName) OR empty($studentid) OR empty($password) OR empty($passwordRepeat)) {
+           if (empty($id) OR empty($password) OR empty($passwordRepeat)) {
             array_push($errors,"All fields are required");
            }
            if (strlen($password)<8) {
@@ -37,7 +37,7 @@ if (isset($_SESSION["user"])) {
             array_push($errors,"Password does not match");
            }
            require_once "database.php";
-           $sql = "SELECT * FROM student WHERE studentid = '$studentid'";
+           $sql = "SELECT * FROM users WHERE id = '$id'";
            $result = mysqli_query($conn, $sql);
            $rowCount = mysqli_num_rows($result);
            if ($rowCount>0) {
@@ -49,11 +49,11 @@ if (isset($_SESSION["user"])) {
             }
            }else{
             
-            $sql = "INSERT INTO student (full_name, studentid, password) VALUES ( ?, ?, ? )";
+            $sql = "INSERT INTO users (id , password) VALUES ( ? , ? )";
             $stmt = mysqli_stmt_init($conn);
             $prepareStmt = mysqli_stmt_prepare($stmt,$sql);
             if ($prepareStmt) {
-                mysqli_stmt_bind_param($stmt,"sss",$fullName, $studentid, $passwordHash);
+                mysqli_stmt_bind_param($stmt,"ss",$id,$passwordHash);
                 mysqli_stmt_execute($stmt);
                 echo "<div class='alert alert-success'>You are registered successfully.</div>";
             }else{
@@ -61,14 +61,12 @@ if (isset($_SESSION["user"])) {
             }
            }
           
+
         }
         ?>
-        <form action="studentregister.php" method="post">
+        <form action="adminregister.php" method="post">
             <div class="form-group">
-                <input type="text" class="form-control" name="fullname" placeholder="Full Name:">
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control" name="studentid" placeholder="Student Id:">
+                <input type="text" class="form-control" name="id" placeholder="Id:">
             </div>
             <div class="form-group">
                 <input type="password" class="form-control" name="password" placeholder="Password:">
@@ -81,7 +79,7 @@ if (isset($_SESSION["user"])) {
             </div>
         </form>
         <div>
-        <div><p>Already Registered <a href="studentlogin.php">Login Here</a></p></div>
+        <div><p>Already Registered <a href="teacherlogin.php">Login Here</a></p></div>
       </div>
     </div>
 </body>
